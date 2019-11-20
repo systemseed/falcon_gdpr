@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Falcon GDPR module file.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Logs all entity deletions.
+ */
+function falcon_gdpr_entity_delete(EntityInterface $entity) {
+  $exclude_entity_types = [
+    'paragraph',
+  ];
+  $type = $entity->getEntityTypeId();
+  if (in_array($type, $exclude_entity_types)) {
+    return;
+  }
+
+  \Drupal::logger('falcon')->info(
+    'Entity @type @id has been deleted.',
+    ['@type' => $type, '@id' => $entity->id()]
+  );
+
+}

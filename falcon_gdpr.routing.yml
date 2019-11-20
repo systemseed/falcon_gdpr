@@ -1,0 +1,7 @@
+falcon_gdpr.settings:
+  path: '/admin/people/falcon-gdpr'
+  defaults:
+    _title: 'Falcon GDPR'
+    _form: 'Drupal\falcon_gdpr\Form\SettingsForm'
+  requirements:
+    _permission: 'administer falcon_gdpr'

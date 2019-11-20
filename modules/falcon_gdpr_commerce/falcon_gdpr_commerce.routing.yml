@@ -1,0 +1,11 @@
+falcon_gdpr_commerce.order:
+  path: '/admin/commerce/orders/{commerce_order}/gdpr'
+  defaults:
+    _form: 'Drupal\falcon_gdpr_commerce\Form\OrderAnonymiserForm'
+    _title: 'GDPR tasks'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _permission: 'view commerce_order'

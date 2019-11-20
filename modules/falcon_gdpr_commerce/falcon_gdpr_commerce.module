@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Falcon GDPR Commerce module file.
+ */
+
+/**
+ * Implements hook_cron().
+ *
+ * Anonymises Commerce Orders on a regular basis.
+ */
+function falcon_gdpr_commerce_cron() {
+  /* @var \Drupal\falcon_gdpr\AnonymiserInterface $anonymiser */
+  $anonymiser = \Drupal::service('falcon_gdpr.anonymiser');
+  $logger = \Drupal::logger('falcon_gdpr');
+  $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
+  $config = \Drupal::config('falcon_gdpr.settings');
+
+  $threshold_strtotime = $config->get('threshold_strtotime');
+  $threshold = strtotime($threshold_strtotime);
+  if (empty($threshold_strtotime) || empty($threshold)) {
+    return;
+  }
+  $entities_per_cron = (int) $config->get('entities_per_cron');
+  if ($entities_per_cron <= 0 || $entities_per_cron > 50) {
+    // Set default to 20 if config is invalid.
+    $entities_per_cron = 20;
+  }
+
+  // Fetch orders for processing. Note that we load all types of orders in all
+  // possible states. Anonymiser will figure out how to handle different cases.
+  $query = $order_storage->getQuery()
+    // Query all orders that haven't been anonymised yet.
+    ->notExists('field_gdpr_anonymised')
+    ->sort('order_id')
+    ->range(0, $entities_per_cron);
+
+  // In case of drafts we filter by state AND created date.
+  $group_drafts = $query->andConditionGroup()
+    ->condition('created', $threshold, '<=')
+    ->condition('state', 'draft');
+
+  $group_completed_or_drafts = $query->orConditionGroup()
+    ->condition($group_drafts)
+    ->condition('completed', $threshold, '<=');
+
+  $query->condition($group_completed_or_drafts);
+
+  $query->accessCheck(FALSE);
+  $ids = $query->execute();
+
+  if (empty($ids)) {
+    return;
+  }
+
+  $logger->info('Commerce orders anonymisation started at %time', ['%time' => date('H:i:s')]);
+  $orders = $order_storage->loadMultiple($ids);
+  $results = [
+    '@processed' => 0,
+    '@loaded' => count($orders),
+  ];
+
+  foreach ($orders as $order) {
+    if ($anonymiser->processEntity($order)) {
+      $results['@processed']++;
+    }
+  }
+
+  $results['%time'] = date('H:i:s');
+  $logger->info('Commerce orders anonymisation finished at %time. Processed @processed out of @loaded total loaded orders.', $results);
+}

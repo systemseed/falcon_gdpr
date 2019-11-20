@@ -1,0 +1,9 @@
+name: Falcon GDPR Commerce
+description: Applies Falcon GDPR policies to Commerce orders on a regular basis
+core: 8.x
+type: module
+package: Falcon
+dependencies:
+  - falcon_gdpr:falcon_gdpr
+  - commerce:commerce_order
+  - ultimate_cron:ultimate_cron

@@ -1,0 +1,3 @@
+administer falcon_gdpr:
+  title: 'Administer Falcon GDPR tools'
+  restrict access: true

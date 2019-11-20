@@ -1,0 +1,16 @@
+services:
+  falcon_gdpr.anonymiser:
+    class: Drupal\falcon_gdpr\Anonymiser
+    arguments:
+     - '@entity_type.manager'
+     - '@config.factory'
+     - '@plugin.manager.falcon_entity_anonymiser'
+     - '@logger.channel.falcon_gdpr'
+     - '@datetime.time'
+  plugin.manager.falcon_entity_anonymiser:
+    class: Drupal\falcon_gdpr\EntityAnonymiserPluginManager
+    parent: default_plugin_manager
+  logger.channel.falcon_gdpr:
+    class: Drupal\Core\Logger\LoggerChannel
+    factory: logger.factory:get
+    arguments: ['falcon_gdpr']

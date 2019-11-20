@@ -1,0 +1,6 @@
+falcon_gdpr.settings:
+  title: 'Falcon GDPR'
+  parent: user.admin_index
+  description: 'Configure Falcon GDPR settings.'
+  weight: 10
+  route_name: falcon_gdpr.settings

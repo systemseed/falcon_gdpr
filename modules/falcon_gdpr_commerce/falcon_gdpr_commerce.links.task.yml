@@ -1,0 +1,5 @@
+falcon_gdpr_commerce.commerce_order.gdpr:
+  route_name: falcon_gdpr_commerce.order
+  base_route: entity.commerce_order.canonical
+  title: 'GDPR'
+  weight: 20
