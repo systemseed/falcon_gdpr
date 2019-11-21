@@ -6,4 +6,3 @@ package: Falcon
 dependencies:
   - falcon_gdpr:falcon_gdpr
   - commerce:commerce_order
-  - ultimate_cron:ultimate_cron

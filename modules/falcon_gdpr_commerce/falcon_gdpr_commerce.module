@@ -23,7 +23,7 @@ function falcon_gdpr_commerce_cron() {
     return;
   }
   $entities_per_cron = (int) $config->get('entities_per_cron');
-  if ($entities_per_cron <= 0 || $entities_per_cron > 50) {
+  if ($entities_per_cron <= 0 || $entities_per_cron > 500) {
     // Set default to 20 if config is invalid.
     $entities_per_cron = 20;
   }
