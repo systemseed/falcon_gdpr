@@ -69,7 +69,7 @@ class OrderAnonymiserForm extends FormBase {
     }
 
     $not_pushed_in_crm = $this->order->hasField('field_crm_sync_timestamp') && $this->order->get('field_crm_sync_timestamp')->isEmpty();
-    if ($this->order->getState()->getId() === 'completed' && $not_pushed_in_crm) {
+    if ($this->order->getState()->value === 'completed' && $not_pushed_in_crm) {
       $this->messenger()->addWarning($this->t('This order has not been pushed to CRM yet.'));
       return $form;
     }

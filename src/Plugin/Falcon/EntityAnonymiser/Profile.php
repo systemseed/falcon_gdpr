@@ -27,7 +27,6 @@ class Profile extends EntityAnonymiserPluginBase {
       'field_profile_address',
       'field_profile_email',
       'field_profile_first_name',
-      'field_profile_last_name',
       'field_profile_phone',
       'field_profile_title'
     ];

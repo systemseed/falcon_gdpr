@@ -24,7 +24,7 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
     $customer = $order->getCustomer();
 
     /* @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $delete_mode = $order->getState()->getId() === 'draft';
+    $delete_mode = $order->getState()->value === 'draft';
 
     // Fields that should be cleaned up on order level.
     $fields_to_reset = [
@@ -65,12 +65,14 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
     }
 
     // Handle billing profile.
-    $email_placeholder = '- Anonymised - / Last name: ';
+    $email_placeholder = '- Anonymised -';
     if ($profile = $order->getBillingProfile()) {
       // Grab customer's last name before anonymising billing profile.
-      $billing_address = $profile->get('address')->first();
-      if (!empty($billing_address)) {
-        $email_placeholder .= $billing_address->getFamilyName();
+      if ($profile->hasField('address') && !$profile->get('address')->isEmpty()) {
+        $billing_address = $profile->get('address')->first();
+        if (!empty($billing_address) && $billing_address->getFamilyName()) {
+          $email_placeholder .= ' / Last name: ' . $billing_address->getFamilyName();
+        }
       }
 
       if ($delete_mode) {
@@ -116,7 +118,7 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
       throw $e;
     }
 
-    if (!$customer->isAnonymous()) {
+    if ($customer && !$customer->isAnonymous()) {
       $this->anonymiser->processEntity($customer);
     }
   }
