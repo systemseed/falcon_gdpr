@@ -20,8 +20,19 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
    * {@inheritdoc}
    */
   public function process(EntityInterface $order) {
-    /* @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    /* @var \Drupal\user\UserInterface $customer */
     $customer = $order->getCustomer();
+
+    /* @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $delete_mode = $order->getState()->getId() === 'draft';
+
+    // Fields that should be cleaned up on order level.
+    $fields_to_reset = [
+      'ip_address',
+      'uid',
+      'payment_method',
+      'field_crm_metadata',
+    ];
 
     // Collection of all sub-entities that should be either deleted or updated.
     $entities_to_delete = [];
@@ -61,10 +72,17 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
       if (!empty($billing_address)) {
         $email_placeholder .= $billing_address->getFamilyName();
       }
-      $entities_to_delete[] = $profile;
+
+      if ($delete_mode) {
+        $entities_to_delete[] = $profile;
+      }
+      else {
+        $this->anonymiser->processEntity($profile);
+      }
+
     }
 
-    if ($order->getState()->getId() === 'draft') {
+    if ($delete_mode) {
       // In draft mode delete everything.
       $entities_to_delete = array_merge($entities_to_delete, $entities_to_update);
       $entities_to_delete[] = $order;
@@ -73,15 +91,6 @@ class CommerceOrder extends EntityAnonymiserPluginBase {
     }
     else {
       $order->setEmail($email_placeholder);
-
-      // Clean up fields that can contain personal data.
-      $fields_to_reset = [
-        'ip_address',
-        'uid',
-        'payment_method',
-        'billing_profile',
-        'field_crm_metadata',
-      ];
       foreach ($fields_to_reset as $field_name) {
         if ($order->hasField($field_name) && !$order->get($field_name)->isEmpty()) {
           $order->{$field_name} = NULL;
