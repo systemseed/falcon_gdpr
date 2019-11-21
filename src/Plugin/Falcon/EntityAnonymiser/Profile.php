@@ -19,7 +19,7 @@ class Profile extends EntityAnonymiserPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function process(EntityInterface $entity) {
+  public function process(EntityInterface $profile) {
     // Clean up fields that can contain personal data.
     $fields_to_reset = [
       'address',
@@ -30,13 +30,16 @@ class Profile extends EntityAnonymiserPluginBase {
       'field_profile_phone',
       'field_profile_title'
     ];
-    /* @var \Drupal\profile\Entity\ProfileInterface $entity */
+    /* @var \Drupal\profile\Entity\ProfileInterface $profile */
     foreach ($fields_to_reset as $field_name) {
-      if ($entity->hasField($field_name) && !$entity->get($field_name)->isEmpty()) {
-        $entity->{$field_name} = NULL;
+      if ($profile->hasField($field_name) && !$profile->get($field_name)->isEmpty()) {
+        $profile->{$field_name} = NULL;
       }
     }
+    // Assign a profile to anonymous user so it will not be deleted if owner
+    // is deleted.
+    $profile->setOwnerId(0);
 
-    $entity->save();
+    $profile->save();
   }
 }
