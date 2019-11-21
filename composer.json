@@ -1,0 +1,7 @@
+{
+    "name": "drupal/falcon_gdpr",
+    "type": "drupal-module",
+    "description": "GDPR tools for Falcon backend",
+    "homepage": "https://github.com/systemseed/falcon_gdpr",
+    "license": "GPL-2.0+"
+}
