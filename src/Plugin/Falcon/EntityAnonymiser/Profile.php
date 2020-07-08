@@ -28,7 +28,8 @@ class Profile extends EntityAnonymiserPluginBase {
       'field_profile_email',
       'field_profile_first_name',
       'field_profile_phone',
-      'field_profile_title'
+      'field_profile_title',
+      'field_title',
     ];
     /* @var \Drupal\profile\Entity\ProfileInterface $profile */
     foreach ($fields_to_reset as $field_name) {
